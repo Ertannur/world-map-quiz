@@ -22,6 +22,16 @@ A modern, interactive geography quiz web application built with React, TypeScrip
 
 Visit the live application: [World Map Quiz](http://localhost:5173) (when running locally)
 
+## ⚠️ Demo Authentication
+
+This project uses **mock authentication for demonstration purposes only**. The authentication system is purely client-side simulation using localStorage and does not involve real password validation or secure user management. 
+
+**Do not use this authentication system in production applications.**
+
+## 🔒 Security Note
+
+This is a **frontend-only demo application** with simulated authentication. No real user data is collected, transmitted, or stored on any servers. All data remains in your browser's local storage for demo purposes only.
+
 ## 🛠️ Tech Stack
 
 ### Core Technologies
@@ -238,6 +248,20 @@ If you encounter any issues or have questions:
 1. Check the [Issues](https://github.com/yourusername/world-map-quiz/issues) page
 2. Create a new issue with detailed description
 3. Join the discussion in existing threads
+
+## 🔐 Security & Privacy
+
+### Demo Application Disclaimer
+- **Educational Purpose**: This project is designed for learning and portfolio demonstration
+- **No Real Authentication**: Uses mock authentication system - not suitable for production
+- **Local Data Only**: All user data stays in your browser's localStorage
+- **No Backend**: This is a pure frontend application with no server-side components
+- **Safe for Public Repos**: Contains no sensitive information, API keys, or secrets
+
+### Third-Party Services
+- **REST Countries API**: Free public API (no authentication required)
+- **OpenStreetMap**: Free map tiles via Leaflet.js
+- **CDN Resources**: Uses public CDN for Leaflet marker icons
 
 ---
 
