@@ -1,0 +1,17 @@
+/* App styles - using TailwindCSS for main styling */
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+/* Custom map markers */
+.leaflet-popup-content {
+  font-family: inherit;
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.2s ease-in-out;
+}
