@@ -44,6 +44,13 @@ export const useQuizStore = create<QuizState>((set, get) => ({
   setCountries: (countries) => set({ countries }),
 
   loadCountries: async () => {
+    const { countries } = get();
+    
+    // Don't reload if we already have countries
+    if (countries.length > 0) {
+      return;
+    }
+    
     try {
       // Try the basic endpoint with a timeout and retry logic
       const controller = new AbortController();

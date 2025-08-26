@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import type { LatLngExpression } from 'leaflet';
 import { useQuizStore } from '../stores/quizStore';
@@ -7,16 +7,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Globe, Clock, Trophy, Target } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default Leaflet icons
+// Fix for default Leaflet icons with Vite
 import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
+// Use CDN-hosted icons to avoid Vite bundling issues
 const DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowSize: [41, 41]
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -56,19 +58,44 @@ export default function QuizPage() {
     resetGame
   } = useQuizStore();
 
+  // Handler functions
+  const handleNextQuestion = useCallback(() => {
+    if (questionIndex + 1 >= totalQuestions) {
+      endGame();
+    } else {
+      nextQuestion();
+      setSelectedAnswer('');
+      setShowFeedback(false);
+      setTimer(30);
+    }
+  }, [questionIndex, totalQuestions, endGame, nextQuestion]);
+
+  const handleTimeUp = useCallback(() => {
+    if (!showFeedback) {
+      setShowFeedback(true);
+      setIsCorrect(false);
+      setTimeout(() => {
+        handleNextQuestion();
+      }, 2000);
+    }
+  }, [showFeedback, handleNextQuestion]);
+
+  const handleAnswerSelect = (answer: string) => {
+    if (showFeedback) return;
+    
+    setSelectedAnswer(answer);
+    const correct = submitAnswer(answer);
+    setIsCorrect(correct);
+    setShowFeedback(true);
+    
+    setTimeout(() => {
+      handleNextQuestion();
+    }, 2000);
+  };
+
   // Timer effect
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
-    
-    const handleTimeUp = () => {
-      if (!showFeedback) {
-        setShowFeedback(true);
-        setIsCorrect(false);
-        setTimeout(() => {
-          handleNextQuestion();
-        }, 2000);
-      }
-    };
     
     if (isPlaying && timer > 0 && !showFeedback) {
       interval = setInterval(() => {
@@ -85,46 +112,12 @@ export default function QuizPage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isPlaying, timer, showFeedback]);
+  }, [isPlaying, timer, showFeedback, handleTimeUp]);
 
   // Load countries on component mount
   useEffect(() => {
     loadCountries();
   }, [loadCountries]);
-
-  const handleTimeUp = () => {
-    if (!showFeedback) {
-      setShowFeedback(true);
-      setIsCorrect(false);
-      setTimeout(() => {
-        handleNextQuestion();
-      }, 2000);
-    }
-  };
-
-  const handleAnswerSelect = (answer: string) => {
-    if (showFeedback) return;
-    
-    setSelectedAnswer(answer);
-    const correct = submitAnswer(answer);
-    setIsCorrect(correct);
-    setShowFeedback(true);
-    
-    setTimeout(() => {
-      handleNextQuestion();
-    }, 2000);
-  };
-
-  const handleNextQuestion = () => {
-    if (questionIndex + 1 >= totalQuestions) {
-      endGame();
-    } else {
-      nextQuestion();
-      setSelectedAnswer('');
-      setShowFeedback(false);
-      setTimer(30);
-    }
-  };
 
   const handleStartGame = (mode: 'world' | 'continent', continent?: string) => {
     startGame(mode, continent);
